@@ -34,5 +34,5 @@ To sync data from the current calendar month ONLY
 `/opt/spacewalk-ubuntu-errata/errata-sync.sh`
 
 **Cron Entry**
-`0 2 * * * /opt/spacewalk-ubuntu-errata/errata-sync.sh`
+`0 2 * * * root /bin/bash /opt/spacewalk-ubuntu-errata/errata-sync.sh`
 
