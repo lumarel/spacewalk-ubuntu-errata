@@ -1,8 +1,7 @@
-#!/bin/env python
-#
-# Pedro Andujar || twitter: pandujar || email: @segfault.es || @digitalsec.net
+#!/usr/bin/env python
 # 
 # Changelog:
+# 2020-12-18 - Removed references to Publish to fix compatibility with Uyuni
 # 2017-11-06 - Set UTF-8 caracter encoding to import errata from Spacewalk correctly
 # 2015-08-25 - Fix to support python2.6. Added reattempts
 # 2015-06-19 - Limit description 4000 chars
@@ -18,11 +17,11 @@ import xml.etree.cElementTree as xml
 
 #Config Settings#
 url = "http://localhost/rpc/api"
-login = "login"
+login = "username"
 passwd = "password"
 filename = 'ubuntu-errata.xml'
-excludedChannels = ['precise', 'trusty'] # Scan all available channels except these ones
-includedChannels = [ ] # Only scan channels on this list
+excludedChannels = [''] # Scan all available channels except these ones
+includedChannels = ['ubuntu-1804-amd64-main-uyuni','ubuntu-1804-amd64-main-security-uyuni','ubuntu-1804-amd64-main-updates-uyuni','ubuntu-1804-amd64-universe-uyuni','ubuntu-1804-amd64-universe-updates-uyuni'] # Only scan channels on this list
 #Config Settings#
 
 key = ''
@@ -33,7 +32,6 @@ keywords = [ ]
 packages = [ ]
 bug = [ ]
 client = ''
-publish = True
 attempts = 0
 
 #xmlrpc connect to server and retrieve key
@@ -98,13 +96,13 @@ def getDetailsErratum(key, erratum):
       print "[-] No related packages found: skipping"
     else:
       print "[+] Found %s packages related: Publishing" % len(packageids)
-      createErratum(key, erratum, issue_date, erratainfo, keywords, packageids, cves, publish, channels)
+      createErratum(key, erratum, issue_date, erratainfo, keywords, packageids, cves, channels)
 
 #Create and publish errata  
-def createErratum(key, erratum, issue_date, erratainfo, keywords, packageids, cves, publish, channels):
+def createErratum(key, erratum, issue_date, erratainfo, keywords, packageids, cves, channels):
   try:
     print "[+] Creating errata %s:" % erratum
-    print client.errata.create(key, erratainfo, bug, keywords, [], publish, list(set(channels)))
+    print client.errata.create(key, erratainfo, bug, keywords, [], list(set(channels)))
 #Include aditional info using setDetails method (not supported by create method)
 #http://www.spacewalkproject.org/documentation/api/2.3/handlers/ErrataHandler.html#setDetails
     client.errata.setDetails(key, erratum, {'update_date': issue_date})
@@ -118,7 +116,7 @@ def createErratum(key, erratum, issue_date, erratainfo, keywords, packageids, cv
     if attempts < 3:
       attempts += 1
       print "[x] Reattemp: %s" % attempts
-      createErratum(key, erratum, issue_date, erratainfo, keywords, packageids, cves, publish, channels)
+      createErratum(key, erratum, issue_date, erratainfo, keywords, packageids, cves, channels)
     else:
       attempts = 0
 
