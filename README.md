@@ -1,14 +1,38 @@
-- **getDebianAnnouncements.py** By https://github.com/rpasche This downloads all security announcements of debian from the current year and the year before and uses html2text to transform it to ascii text
-- **parseUbuntu.py** parses https://lists.ubuntu.com/archives/ubuntu-security-announce/$DATE.txt.gz into an XML which can be read by errata-import.pl / errata-import.py
-- **parseDebian.py** By https://github.com/rpasche the same as parseUbuntu.py, but parses all security announcements downloaded with getDebianAnnouncements.py and writes this to an XML file for later use with errata-import-debian.py
-- **errata-import.pl** originally by Steve Meier http://cefs.steve-meier.de/ I just modified it slightly to work with Ubuntu USN.
-- **errata-import.py** By https://github.com/pandujar Ported version of the previous one. Includes some enhancenments like date, author and better package processing. Its quite faster than the Perl version.
-- **errata-import-debian.py** By https://github.com/rpasche This is the modified version of errata-import.py for Debian
-- **errata.py** is the missing "action" for rhn_check so it can apply Errata. Copy it to /usr/share/rhn/actions 
-Its just a copy of https://github.com/spacewalkproject/spacewalk/tree/master/client/rhel/yum-rhn-plugin/actions
-- **spacewalk-errata.sh** is a Bash script which downloads the compressed security announces, calls parseUbuntu.py on them and finally calls errata-import.py to import the Errata. This script can be run as a Cronjob to automate things.
-- **errataToSlack.py** reports all errata affecting at least one system to a Slack channel or group
-- **getSystemUpdatesHistory.py** Lists all packages installed on a given node after a datetime or after X hours before now
-If no datetime is given, packages installed in past 24h are listed.
-- **import-old.sh** imports all errata from Jan 2012 to the month just before today when run; in effect provides constantly up-to-date ubuntu-errata.xml file
-- **debianSync.py** Ported version of https://github.com/stevemeier/spacewalk-debian-sync . Its a drop-in replacement, meaning all arguments are the same
+# Spacewalk/Uyuni Errata Import for Ubuntu
+Modified version of https://github.com/philicious/spacewalk-scripts
+
+- **parseUbuntu.py** parses https://lists.ubuntu.com/archives/ubuntu-security-announce/$DATE.txt.gz into an XML which can be read by errata-import.py
+- **errata-import.py** By https://github.com/pandujar Ported version of the previous one. Includes some enhancenments like date, author and better package processing. Its quite faster than the Per>
+- **errata-sync.sh** Modified version from uyuni import scripts.
+
+This script will download errata information from Ubuntu, parse it, and import it into a spacewalk or Uyuni server for use as patch data. This allows you to see if an update contains a bugfix, security update, etc.
+### Requirements
+ - Python
+ - An administrative account on your Spacewalk/Uyuni server
+
+
+### Usage
+First, clone the repository onto the Uyuni server
+`git clone https://github.com/Twhitehouse-SSHIS/spacewalk-ubuntu-errata /opt/spacewalk-ubuntu-errata`
+*Ensure the files are executable by root.*
+
+Secondly, edit the **errata-import.py** script and modify the ***login*** and ***passwd*** at the top of the script. This needs to be an administrative account on Spacewalk/Uyuni
+
+Thirdly, amend the excluded/included channels as necessary. The defaults are Uyuni\'s 1806 default channel names.
+
+Finally, run the **errata-sync.sh** script either with or without the "all" switch, and add it to your CRON as appropriate, I suggest daily, early in the morning.
+
+
+#### Example:
+
+**Run this at least once**
+To sync data from the first full month of Ubuntu updates
+`/opt/spacewalk-ubuntu-errata/errata-sync.sh all`
+
+**Run this moving forward** (This should be your CRON command)
+To sync data from the current calendar month ONLY
+`/opt/spacewalk-ubuntu-errata/errata-sync.sh`
+
+**Cron Entry**
+`0 2 * * * /opt/spacewalk-ubuntu-errata/errata-sync.sh`
+
