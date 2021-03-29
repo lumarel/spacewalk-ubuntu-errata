@@ -4,7 +4,7 @@
 ## Edit variables in errata-import.py first ##
 
 # Get the base path for the script #
-BASE_PATH="$(echo ${0} | sed 's/errata-sync-sshis.sh//')"
+BASE_PATH=`dirname $0`
 
 # Make sure we have English locale
 export LC_TIME="en_US.utf8"
@@ -38,24 +38,24 @@ if [ "$1" = "all" ]; then
                 # Download and extract archives from USN
                 DATE="20${y}-${m}"
                 logger "Downloading errata from $m 20$y..."
-                curl --progress-bar https://lists.ubuntu.com/archives/ubuntu-security-announce/$DATE.txt.gz > ${BASE_PATH}errata/$DATE.txt.gz
-                gunzip -f ${BASE_PATH}errata/$DATE.txt.gz
+                curl --progress-bar https://lists.ubuntu.com/archives/ubuntu-security-announce/$DATE.txt.gz > ${BASE_PATH}/errata/$DATE.txt.gz
+                gunzip -f ${BASE_PATH}/errata/$DATE.txt.gz
             fi
         done
     done
     # Combine logs into one file for import
-    cat ${BASE_PATH}errata/*.txt > ${BASE_PATH}errata/old.txt
+    cat ${BASE_PATH}/errata/*.txt > ${BASE_PATH}/errata/old.txt
     # Processes and imports the errata
     logger "Converting archives into XML for processing..."
     cd ${BASE_PATH} && \
-    ${BASE_PATH}parseUbuntu.py ${BASE_PATH}errata/old.txt
+    ${BASE_PATH}/parseUbuntu.py ${BASE_PATH}/errata/old.txt
     logger "Starting Errata importing..."
 else
 # Download Latest Errata
-    curl https://lists.ubuntu.com/archives/ubuntu-security-announce/$DATE.txt.gz > ${BASE_PATH}errata/$DATE.txt.gz
+    curl https://lists.ubuntu.com/archives/ubuntu-security-announce/$DATE.txt.gz > ${BASE_PATH}/errata/$DATE.txt.gz
     gunzip -f errata/$DATE.txt.gz
 fi
 
 # Processes and imports the errata.
-${BASE_PATH}parseUbuntu.py errata/$DATE.txt
-${BASE_PATH}errata-import.py
+${BASE_PATH}/parseUbuntu.py errata/$DATE.txt
+${BASE_PATH}/errata-import.py
