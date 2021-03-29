@@ -12,6 +12,9 @@ export LC_TIME="en_US.utf8"
 # Obtains the current date and year.
 DATE=`date +"%Y-%B"`
 
+# Make sure that the errata folder exists
+mkdir -p ${BASE_PATH}/errata
+
 # Cleanup before download
 cd ${BASE_PATH}
 rm -rf errata/*.txt
