@@ -73,7 +73,7 @@ class MessageParser(object):
     PKGINFO = "Package Information:"
     ERRATA_SUBJECT="\[USN-(?P<errata_id>\d+-\d+)\] (?P<other_info>.*)"
     ERRATA_PKGS = "\s\s(?P<pkg_filename>.*)\s(?P<pkg_version>.*)"
-    CVE = "(?P<cve>CVE-\d{4}-\d{4})"
+    CVE = "(?P<cve>CVE-\d{4}-\d{4,5})"
 
     erratum_subject_re = re.compile(ERRATA_SUBJECT)
     release_re = re.compile(RELEASE)
